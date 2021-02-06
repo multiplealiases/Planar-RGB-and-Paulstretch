@@ -1,7 +1,7 @@
 # Databending with Audacity: The Effect of Paulstretch on Planar RGB Images
 
 ## Required Software
-(These are not truly needed to achieve the same result; this is just what I know works. Feel free to port this piece to other OSes or automate/optimize it)
+(These are not strictly needed to achieve the same result; this is just what I know works. Feel free to port this piece to other OSes or automate/optimize it)
  - Windows 7 or newer
  - Irfanview
  - Audacity
