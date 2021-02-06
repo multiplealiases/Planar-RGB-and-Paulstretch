@@ -45,7 +45,7 @@ The Time Resolution's not important here yet; just set it to 50 seconds first. S
 
 You can listen to this if you want. It just sounds "blurred". For the eagle-eyed among you, you'll have noticed that Paulstretch has changed the length of the file. This won't affect anything, not in this article.
 
-As usual, just export this and open it with the correct parameters...
+Let's open Irfanview, export this and open it with the correct parameters...
 
 ![A colorful and textured image. The texture is vaguely reminiscent of the original, which was a sand dune.](https://i.imgur.com/gf1RDvH.jpg)
 
