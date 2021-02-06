@@ -1,202 +1,155 @@
-# Databending with Audacity: What I do Differently/Required Reading
+# Databending with Audacity: The Effect of Paulstretch on Planar RGB Images
 
 ## Required Software
-(These are not strictly needed to achieve the same result; this is just what I know works. Feel free to port this piece to other OSes or automate/optimize it)
+(These are not truly needed to achieve the same result; this is just what I know works. Feel free to port this piece to other OSes or automate/optimize it)
  - Windows 7 or newer
  - Irfanview
  - Audacity
-
-## Background and Introduction
-
-A while ago, I read about [databending using Audacity](https://www.hellocatfood.com/databending-using-audacity/). It was fascinating that you could just have an audio program just interpret raw image data as if it were audio.
-
-I won't bore you with the details, but the basic premise is as follows: 
-
-	   +-------------------+         +--------------------------------+            +-------------------------------------+
-	   |                   |         |                                |            |                                     |
-	   | Take a .bmp image | +-----> | Import as raw data in Audacity |  +------>  | Do wacky effects to imported audio  +-+
-	   |                   |         |                                |            |                                     | |
-	   +-------------------+         +--------------------------------+            +-------------------------------------+ |
-	                                                                                                                       |
-	+----------------------------------------------------------------------------------------------------------------------+
-	|
-	|  +-------------------+                     +----------------------+              +---------------------------------+
-	|  |                   |                     |                      |              |                                 |
-	+> | Save audio as RAW | +---------------->  | Open resulting image | +----------> | Save in a more shareable format |
-	   |                   |                     |                      |              |                                 |
-	   +-------------------+                     +----------------------+              +---------------------------------+
-
-
-
-
-And that's it, really. There are, however, certain things I want to do differently. These things will be the basis of how I databend with Audacity, so it's the "Required Reading" of my guides.
-
-## Import as Unsigned 8-bit PCM, not U-Law.
-The idea here is that this format is a direct representation of the bytes in a raw image format. If we were to use 24-bit RGB, then every R, G and B component each gets one byte each mapped to one sample of the audio.
-
-Also, U-Law introduces some error when you export it. Take this photo:
-
-![Wallpaper photo](https://imgur.com/CCUypqN.jpg)
-[Photo](https://unsplash.com/photos/n7a2OJDSZns) by [Harli Marten](https://unsplash.com/@harlimarten) on [Unsplash](https://unsplash.com/)
-(If you wish to replicate my results, download the Medium-sized image)
-
-Convert that into .bmp. Import it into Audacity as raw data with the following settings:
-
-![Audacity "Import Raw Data" dialogue. Encoding is U-Law, Byte order is Little-endian, Channels is 1 Channel (Mono). Start offset is 0 bytes, Amount to import is 100%, and sample rate is 44100 Hz](https://i.imgur.com/UqudxNc.png)
-
-You'll see something like this:
-
-![Audacity interface. It shows the waveform of a .bmp file interpreted as U-Law audio. ](https://i.imgur.com/gh4VPtZ.png)
-
-Just ignore it, and go straight to File -> Export -> Export Audio..., and you'll see this dialogue. Change the settings as shown.
-
-![Audacity "Export Audio" dialog. Under Format Options, Heading is set to "RAW (header-less)" and Encoding is set to "U-Law"](https://i.imgur.com/LLozAix.png)
-
-Save, and you'll end up with an image that looks like this:
-
-![Same image as the original wallpaper photo, but with curved lines of green and red running across it.](https://i.imgur.com/K2gOGy7.jpg)
-
-I'm not sure about you, but I'd rather have the effects corrupt the image, not the encoding itself. 
-
-If you did the exact same thing, but with the import and export encoding set to "Unsigned 8-bit", you'll get this:
-
-![Irfanview "Set RAW open parameters" dialog](https://i.imgur.com/mAv1UkA.png)
-
-Which is not the intended result. Unsigned 8-bit seems to corrupt the header more often than not, and it'll open as a .raw file instead of a .bmp file. Most photo viewers won't even give you this, instead spitting out something like "corrupted file".
-
-However, if you open it with those parameters anyway, you'll be greeted with this:
-
-![An identical copy of the original wallpaper photo.](https://i.imgur.com/s83ZWvD.jpg)
-It's identical to the original, minus whatever compression artifacts were introduced due to saving in JPEG. This is perfect.
-
-This nonsense involving having to open as RAW brings me to my second point:
-
-## Don't use BMP. Just use RAW images.
-The problem with .bmp is that if the header's borked, you can't open it, as we just saw. This is why I prefer to work with RAW images, since you can do whatever you want with it, and as long as you know what parameters to use, it *will* open, no questions asked. They don't have a header to corrupt, so it is utterly impossible to render them unopenable.
-
-Using Irfanview, it's absolutely trivial to save an image as RAW. Let's take this image:
-
-![close-up photo of common sunflower](https://i.imgur.com/XHsLn0s.jpg)
-
-(Attribution: [Photo](https://unsplash.com/photos/5lRxNLHfZOY) by [Paul Green](https://unsplash.com/@pgreen1983) on [Unsplash](https://unsplash.com/))
-(To follow along, use the Medium version)
-
-Open it up in Irfanview:
-
-![The same sunflower picture, but opened in Irfanview](https://i.imgur.com/VE22aJn.png)
-
-Go under File -> Save as..., and you'll be shown this:
-
-![Save as dialog in Irfanview](https://i.imgur.com/xgqtng2.png)
-
-The things you want to change here are the "Save as type" and the RAW save options. Set "Save as type" to "RAW - RAW Image Data" and under "Options for 24 BPP images", set "Color order: RGB" and "Planar (RRR...GGG...BBB)"
-
-I'll get to why I use a planar format later on. For now, save it. Let's take a look at it in Explorer.
-
-![Windows Explorer interface. "sunflower.raw" is selected, showing a size of 15.8MB.](https://i.imgur.com/ATL8JZ7.png)
-
-15.8 MB. It's absolutely gigantic compared to the original, which was only
-698 KB. Why is that? The basic idea here is that these raw formats are uncompressed. They literally just write down the information as it is without compressing it at all. This is horrendous if you want to share images, but it's absolutely invaluable to how I databend. Compressed formats have this tendency to just break if you're not careful.
-
-For most practical databending, a resolution of (something)×1080 (keeping aspect ratio) is probably enough. Larger files are harder for Audacity to work with because they're read as longer audio and take longer to process. I won't stop you, of course, but just be mindful of that. I'll assume you know how to resize images.
-
-To open the raw image that we just made, let's go back to Irfanview and try to open it:
-
-![Irfanview "Set RAW open parameters" dialog](https://i.imgur.com/BnppH7N.png)
-
-And this shows up again. The important things to follow are
-
- - Set resolution to the original image's. In this case, "Image width" is 1920, and "Image height" is 2880.
- - Set BitsPerPixel (BPP) to "24 BPP (3 bytes per pixel)"
- - Don't touch the Misc options; just turn off the "Vertical Flip", "Grayscale" and "Bayer Pattern Used" options.
- - Under "Options for 24 and 32 BPP, set "Color order: RGB", and "Planar (RRR... GGG... BBB)".
  
-In general, you want to match the original image's properties.
+## Required Reading
+If you wish to follow along, please read and understand these two articles first:
 
-Once that's done, you should see this:
+[Databending using Audacity](https://www.hellocatfood.com/databending-using-audacity/) by hellocatfood
 
-![Irfanview interface. It is showing a picture of a sunflower.](https://i.imgur.com/SquWZmU.png)
+[Databending with Audacity: What I do Differently/Required Reading](https://github.com/multiplealiases/Databending-In-Audacity-Required-Reading/blob/main/README.md) by me
 
-And you've just opened a RAW image. Let's pretend this is a databent file we just made, and you want to make a copy of it that you can easily share. Repeat the process of Saving As, and this shows up:
+I'll assume you understand the basic idea of converting images into raw data, importing them into Audacity, applying effects to it, exporting the results, then opening the raw data in a suitable image viewer. That's covered by the first one.
 
-!["Save Picture As..." dialog in Irfanview.](https://i.imgur.com/iMnJiW1.png)
+The second one covers how I do databending with Audacity, and how my method differs from the one detailed in the first article.
+ 
+To replicate my results, go to each respective image's source, and download the "Medium" size.
 
-Set the "Save as type" to "PNG - Portable Network Graphics". PNG produces larger formats than JPEG, yes, but I do this because PNG is lossless. It is a perfect, pixel-for-pixel copy of the image. Think of it as a master, the absolute highest quality version of your image that you can use for editing. For sharing, you can use JPEG, scale the image down, whatever.  
+## Paulstretch, what does that do?
+[Paulstretch](http://hypermammut.sourceforge.net/paulstretch/) is an effect suitable for extreme stretching of audio, 50x or more. It essentially "smooths out" audio. Try it yourself in Audacity; open a file with some music on it, run Paulstretch at a Stretch Factor of 10 and a Time Resolution of 2 seconds, and listen to how it just "blurs" the sound together. 
 
-It depends on how long you're willing to wait, but I prefer to set my "Compression level" to 9, the highest. My databending often produces very hard-to-compress files, so I like to compress it as hard as possible just because it's more space-efficient.
+With that in mind, I thought to myself, "Wait, what happens if I tried this with image data?". Let's get today's test subject.
 
-## Use *planar* RAW images.
-"Wait, what's planar?", you're probably asking. I'll try to explain it as concisely as possible:
+![White wavy texture of a sand dune](https://i.imgur.com/wBdHKEI.jpg)
+[Photo](https://unsplash.com/photos/7Y0NshQLohk) by [Sumner Mahaffey](https://unsplash.com/@sumnerm) on [Unsplash](https://unsplash.com/)
 
-Let's define the terms R, G and B. These are the Red, Green and Blue components of an image. With RAW images, there are two standard ways to write down the image data.  Either it's interleaved, or it's planar. 
+You know the drill. Convert to planar RGB RAW, open Audacity, import as shown here:
 
-Interleaved basically goes (RGB, RGB, RGB) (the order can vary depending on the exact format, but you get the picture). Each pixel gets 3 color components packed together into one.
+!["Import Raw Data" dialog box. "Unsigned 8-bit PCM", Little-endian, and "1 Channel (Mono)" are selected. "Start offset" is 0, "Amount to import" is 100%, and the "Sample rate" is 44100 Hz](https://i.imgur.com/iKdjGlD.png)
 
-Planar goes RRR, (...) GGG, (...), BBB. In this case, you get 3 monochrome "planes" (hence the term "planar") of Red, Green, and Blue stored consecutively.
+...and you'll see this. Select the entire thing.
 
-So what's the benefit of planar over interleaved? 
-### Planar images are easier to work with
-Suppose you databent an image, and it isn't centered. Maybe it's too far left, or too far right. Now, you can just save it as PNG and recenter it yourself, or you can use an option in the RAW open dialog.
+![Audacity interface. A waveform is shown representing the recently-imported audio.](https://i.imgur.com/SA1p4Qg.png)
 
-![File header size](https://i.imgur.com/2fGamkI.png)
+Go under Effect > Paulstretch. You'll get this:
 
-File header size. This essentially shifts the image left by however many pixels you specify in bytes. You don't have to be perfect on the first try; you can just reopen the image over and over, adjusting the file header size until the image is centered. You'll lose a few pixels this way, but one or two lines of pixels in an image with a thousand isn't worth crying over. I'll demonstrate with this picture:
+![Paulstretch effect dialog](https://i.imgur.com/gdNpBOv.png)
 
-![assorted color wooden frames photo (original)](https://i.imgur.com/yhgE1YJ.jpg)[Photo](https://unsplash.com/photos/-GUyf8ZCTHM) by [Jessica Ruscello](https://unsplash.com/@jruscello) on [Unsplash](https://unsplash.com)
+The Time Resolution's not important here yet; just set it to 50 seconds first. Stretch Factor, however, must be 1. The image becomes unusable nonsense if it's not 1. Once that's done, press OK.
 
-Let's adjust the header size to 500, 1000, and 1500.
+![Audacity interface. A waveform is shown. It has been distorted by Paulstretch.](https://i.imgur.com/fovHbz7.png)
 
-![Original color wooden frames photo, shifted by 500 bytes. Approximately a quarter of the image's left side is now being displayed on the right due to wraparound.](https://i.imgur.com/teSZTmz.jpg)![Original color wooden frames photo, shifted by 1000 bytes. Approximately half of the image's left side is now being displayed on the right due to wraparound.](https://i.imgur.com/c0ynnwH.jpg)![Original color wooden frames photo, shifted by 1500 bytes. Approximately three-quarter of the image's left side is now being displayed on the right due to wraparound.](https://i.imgur.com/L10oCed.jpg)
+You can listen to this if you want. It just sounds "blurred". For the eagle-eyed among you, you'll have noticed that Paulstretch has changed the length of the file. This won't affect anything, not in this article.
 
-So the offset just shifts the image by some amount left, and anything that would "fall off" the left edge just gets wrapped around to the right.
+Let's open Irfanview, export this and open it with the correct parameters...
 
-Now, that was with a planar RAW image. What about interleaved? Let's offset by just 1 and 2 bytes.
+![A colorful and textured image. The texture is vaguely reminiscent of the original, which was a sand dune.](https://i.imgur.com/gf1RDvH.jpg)
 
-![A hue-shifted version of the original colored wooden frames photo. All reds in the original have been shifted to being green.](https://i.imgur.com/YuclGdI.jpg)![A hue-shifted version of the original colored wooden frames photo. All reds in the original have been shifted to being blue.](https://i.imgur.com/U0SemKj.jpg)
+What? How? It's a spectacular effect, for sure. I didn't do this beforehand; I databent the image while I was writing this article. You'd think that an effect that "blurs" sound would just be a blur effect on images, but this is something else.  
 
-Huh? What just happened to the colors? The problem here is that when Irfanview reads the image data, it expects it to be in the order of RGB. When you misalign it, it goes
+Let's split it into individual R, G and B planes to understand what's going on. I've done it such that R is the first vertical third, G is the 2nd third, and B is the final third.
 
-	            Index  1 2 3 | 4 5 6 | 7 8 9
-	   Expected order: R G B | R G B | R G B 
-	   Shifted by 1  : - R G | B R G | B R G | B
-	   Shifted by 2  : - - R | G B R | G B R | G B
-	   Shifted by 3  : - - - | R G B | R G B | R G B
-	   (- is blank; read as zero)
-It's not reading it in the right order. At index 4, where it expects R, it instead sees the G component when shifted by 1 or the B component at 2. The hue gets shifted by multiples of 60 degrees.
+![The previous image broken down into its R, G and B components, then the components have been stacked on top of each other, from top to bottom, R, G and B. It is monochromatic.](https://i.imgur.com/BsWC5X4.jpg)
 
-So then you have to increment the offset by 1 over and over trying to hit a number that gives you the "expected order" and therefore the correct colors. If the image hasn't been databent, you basically lock it to the nearest multiple of 3. If it has been databent, you'll have to find out by trial and error to find if the pattern's 3n, 3n + 1, or 3n + 2.
+It's like it copies the textures in the original image over and over, overlaying them into a nice final texture. I did it, and you can, too!
 
-Planar images do not have this issue. Let's do the shift by 1 and 2 again:
+### Paulstretch on other textures
+Paulstretch seems to follow the "texture" of the source image. Let's pull out some more test subjects:
 
-![assorted color wooden frames photo shifted by 1 byte. The difference between this and the original is imperceptible.](https://i.imgur.com/T6LFyst.jpg)
-![assorted color wooden frames photo shifted by 2 bytes. The difference between this and the original is imperceptible.](https://i.imgur.com/jayNHzy.jpg)
+![green leaf in close-up](https://i.imgur.com/iRAVqL0.jpg)
+[Photo](https://unsplash.com/photos/EMP0_-qfva8) by [Olivia Hutcherson](https://unsplash.com/@ohutcherson) on [Unsplash](https://unsplash.com)
 
-Nothing drastic, just a tiny shift to the left. The colors are preserved.
+![A white stripe pattern made up of concrete facade ribs](https://i.imgur.com/jJZYJfQ.jpg)[Photo](https://unsplash.com/photos/UKLIuV8rAks) by [Christian Perner](https://unsplash.com/@christianperner) on [Unsplash](https://unsplash.com)
 
-### Planar images produce more colorful results when databent
-This is a more subjective thing, but when I databend interleaved images, I often end up "losing" color. I'll use this picture as my test subject:
 
-![yellow, red, blue, and green feathers photo (original)](https://i.imgur.com/A25Vjup.jpg)
-[Photo](https://unsplash.com/photos/Haz8prUXrI4) by [David Clode](https://unsplash.com/@davidclode) on [Unsplash](https://unsplash.com)
-(Medium size used)
+![pink-and-blue pattern, arranged in triangles](https://i.imgur.com/AfZMYYR.jpg)[Photo](https://unsplash.com/photos/sk59I1qRfEM) by [Scott Webb](https://unsplash.com/@scottwebb) on [Unsplash](https://unsplash.com)
 
-Let's do the same databend to a planar and interleaved version of the same image: a low-pass filter of 1000 Hz with a roll-off of 48 dB per octave.
 
-Interleaved:
+Paulstretch them with the same settings as before, and they turn into this:
 
-![The same photo as before, but now monochromatic and blurry.](https://i.imgur.com/YVA1hsb.jpg)
+![A colorful and textured image. The texture is vaguely reminiscent of the original, which was of a leaf.](https://i.imgur.com/Yj7jOFS.jpg)
+![A colorful and textured image. The texture is vaguely reminiscent of the original, which was of a white stripe pattern](https://i.imgur.com/GvtsE4E.jpg)
+![A colorful and textured image. The texture is vaguely reminiscent of the original, which was a triangular pattern.](https://i.imgur.com/9WWAtmM.jpg)
 
-Planar:
+They all faintly resemble their original pictures, but it's certainly a massive change. It's completely different. (Protip: Apply the Amplify effect at default settings after Paulstretch to prevent clipping of colors.)
 
-![The same photo as the original, but now blurry. It is even blurrier than the previous image.](https://i.imgur.com/QszUDA9.jpg)
+### But it doesn't stop there
+Let's try it on images with less-obvious textures. I'll take these ones:
 
-More detail is lost in the planar version, yes, but that can be mitigated by just adjusting the cut-off of the filter upwards. What you can't mitigate, however, is the total loss of color in the interleaved version. Boost that saturation up as much as you want; you're not getting that color back.
+![Man standing on rock](https://i.imgur.com/r5TfLva.jpg)[Photo](https://unsplash.com/photos/ulG2K7id26s) by [Christopher Czermak](https://unsplash.com/@czermak_photography) on [Unsplash](https://unsplash.com) 
 
-This tendency for interleaved formats to lose color entirely after databending is exactly why I prefer using planar formats.
+![A picture of a nebula](https://i.imgur.com/kjS9pav.jpg)
+[Photo](https://unsplash.com/photos/fsH1KjbdjE8) by [Alexander Andrews](https://unsplash.com/@alex_andrews) on [Unsplash](https://unsplash.com)
 
+Put it through the Paulstretcher, and we have:
+
+
+![A colorful image.](https://i.imgur.com/ozHPG87.jpg)![A colorful image](https://i.imgur.com/PfAqSQv.jpg)
+Fascinating, huh?
+
+### What does Time Resolution do, anyway?
+So far, I've been using a Time Resolution of 50 seconds, because I think it produces nice results. Here's a guinea pig.
+
+![brown guinea pig on brown wooden table](https://i.imgur.com/sFoWw5o.jpg)[Photo](https://unsplash.com/photos/cKYM8KMwaUQ) by [Nils Schirmer](https://unsplash.com/@nilsschirmer) on [Unsplash](https://unsplash.com/)
+
+Let's experiment on it(s picture). First off, Paulstretch at 1 second.
+
+![A colorful image. It has extremely fine multicolored horizontal lines throughout.](https://i.imgur.com/fbxtj7M.jpg)
+
+2:
+
+![A colorful image. It has very fine multicolored horizontal lines throughout.](https://i.imgur.com/mmqNmhu.jpg)
+
+4:
+
+![A colorful image. It has fine multicolored horizontal lines throughout.](https://i.imgur.com/e61VwAd.jpg)
+
+8:
+
+![A colorful image. It has multicolored horizontal lines throughout.](https://i.imgur.com/wgtWwmx.jpg)
+
+16:
+
+![A colorful image.](https://i.imgur.com/2K5gO2c.jpg)
+
+32:
+
+![A colorful image.](https://i.imgur.com/LkZDKvI.jpg)
+
+64:
+
+![A colorful image.](https://i.imgur.com/IKsAVJQ.jpg)
+
+128:
+
+![A colorful image. Halfway down the image, irregular blue vertical stripes show up.](https://i.imgur.com/8wCqNhq.jpg)
+
+It seems that the higher the Time Resolution, the less "liney" the resulting image is. However, the higher it is, the more likely it is that the blue component just gets cut off entirely. I think a safe value for "reasonably sized" images is somewhere between 32 and 64 seconds, so I was justified in using 50 seconds before this.
+
+### Interleaved, and why it sucks here
+Now, I generally don't like interleaved because it tends to lose color here, as it does with most things databending. I'll do it for the sake of completeness. I'll just pull a picture of a cat here:
+
+![white coated Persian cat sitting on brown wooden surface](https://i.imgur.com/6Jl0faD.jpg)[Photo](https://unsplash.com/photos/X7UR0BDz-UY) by [Rana Sawalha](https://unsplash.com/@ranasawalha) on [Unsplash](https://unsplash.com/s/photos/cat?utm_source=unsplash)
+
+Convert this to interleaved RAW, run it through Paulstretch, export it...
+
+![A mostly-monochromatic image in a similar style to the Paulstretched ones before it. Color is barely visible, almost appearing "painted on".](https://i.imgur.com/msAAndc.jpg)
+
+The color's just mostly gone, and it's pretty good pareidolia material; quite spooktacular if you told people that it was haunted or something. You'd have better luck opening this as planar RAW:
+
+![A colorful image](https://i.imgur.com/a3gKasL.jpg)
+
+I'd say this one's way better.
+
+### A small puzzle
+This is a Paulstretched image in planar RGB. Can you figure out what the original image was? Can you reconstruct the original? This is a PNG, so it's an exact pixel-for-pixel copy of what I got from Paulstretching; no compression artifacts here.
+
+![A colorful image](https://i.imgur.com/gga9wHR.png)
 ## Conclusion
-
-This is my way of databending, and I choose to do it this way because this method produces results that I think are good. You can do whatever you want with your art. I encourage you to come up with new and different ways that better suit your purposes.
+Paulstretch... it's a wacky effect. Just transforms images into layers upon layers of textures pasted on top of each other. Try it for yourself; realizing that you've pulled off that with nothing but Audacity and Irfanview is an experience.
 
 If there's anything you'd like to add or change, contact me on GitHub at [multiplealiases](https://github.com/multiplealiases). 
-
