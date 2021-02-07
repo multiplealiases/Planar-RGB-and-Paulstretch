@@ -9,7 +9,7 @@
 ## Required Reading
 If you wish to follow along, please read and understand these two articles first:
 
-- [Databending using Audacity](https://www.hellocatfood.com/databending-using-audacity/) by hellocatfood
+- [Databending using Audacity](https://www.hellocatfood.com/databending-using-audacity/) by Antonio Roberts
 
 - [Databending with Audacity: What I do Differently/Required Reading](https://github.com/multiplealiases/Databending-In-Audacity-Required-Reading/blob/main/README.md) by me
 
