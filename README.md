@@ -3,8 +3,8 @@
 ## Required Software
 (These are not strictly needed to achieve the same result; this is just what I know works. Feel free to port this piece to other OSes or automate/optimize it)
  - Windows 7 or newer
- - Irfanview
- - Audacity
+ - [Irfanview](https://www.irfanview.com/)
+ - [Audacity](https://www.audacityteam.org/)
  
 ## Required Reading
 If you wish to follow along, please read and understand these two articles first:
