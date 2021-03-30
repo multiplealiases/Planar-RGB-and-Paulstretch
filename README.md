@@ -152,4 +152,4 @@ This is a Paulstretched image in planar RGB. Can you figure out what the origina
 ## Conclusion
 Paulstretch... it's a wacky effect. Just transforms images into layers upon layers of textures pasted on top of each other. Try it for yourself; realizing that you've pulled off that with nothing but Audacity and Irfanview is an experience.
 
-If there's anything you'd like to add or change, contact me on GitHub at [multiplealiases](https://github.com/multiplealiases). 
+If there's anything you'd like to add or change, fork (and add a pull request) this repository or contact me on GitHub at [multiplealiases](https://github.com/multiplealiases). 
