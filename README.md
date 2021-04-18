@@ -156,7 +156,7 @@ If there's anything you'd like to add or change, fork (and add a pull request) t
 
 ***
 
-This work (excluding the images that come from Unsplash) is licensed under a
+This work (excluding the images that origninated from Unsplash) is licensed under a
 [Creative Commons Attribution 4.0 International License][cc-by].
 
 [![CC BY 4.0][cc-by-image]][cc-by]
